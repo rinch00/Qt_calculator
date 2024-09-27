@@ -1,4 +1,9 @@
 #include "calculator.h"
+#include "button.h"
+
+#include <QGridLayout>
+#include <QMessageBox>
+
 
 calculator::calculator() : waitingForOperand(true)
 {
@@ -112,41 +117,45 @@ void calculator::percentClicked()
 
 }
 
+
 void calculator::doubleOperationClicked()
 {
-    button *clickedButton = (button*) sender();
+    button *clickedButton = (button*)sender();
     if (!clickedButton)
         return;
-
     QString clickedOperator = clickedButton->text();
-    // Если оператор уже установлен и не ждем операнда, выполнить предыдущую операцию
+    QString displayText = display->text();
+    if (!displayText.isEmpty() && !displayText[displayText.length() - 1].isDigit()) {
+        display->setText(displayText + clickedOperator);
+        currentOperator = clickedOperator;
+        return;
+    }
+
     if (!currentOperator.isEmpty() && !waitingForOperand) {
         equalClicked();
     }
-
-    // Сохраняем первое число и оператор
     firstOperand = display->text().toDouble();
     currentOperator = clickedOperator;
 
-    // Обновляем дисплей, добавляя оператор
-    display->setText(QString::number(firstOperand) + clickedOperator);
+    display->setText(displayText + clickedOperator);
+
+    waitingForOperand = false;
 }
+
 
 void calculator::equalClicked()
 {
     if (currentOperator.isEmpty())
-        return;    // Нет операции для выполнения
+        return;
 
     QString displayText = display->text();
 
-    // Начинаем поиск оператора с позиции 1, чтобы пропустить знак первого числа
     int operatorIndex = displayText.indexOf(currentOperator, displayText.startsWith('-') ? 1 : 0);
 
     if (operatorIndex == -1) {
-        return; // Оператор не найден в дисплее
+        return;
     }
 
-    // Извлекаем второе число из дисплея
     QString secondOperandStr = displayText.mid(operatorIndex + currentOperator.length());
     double secondOperand = secondOperandStr.toDouble();
 
@@ -155,11 +164,7 @@ void calculator::equalClicked()
         QMessageBox::warning(this, "Ошибка", "Неизвестная операция");
         return;
     }
-
-    // Обновляем дисплей с результатом
     display->setText(QString::number(result));
-
-    // Сбрасываем оператор и флаг ожидания
     currentOperator.clear();
 
     waitingForOperand = false;

@@ -1,17 +1,12 @@
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
 
-#include "button.h"
 #include <QWidget>
 #include <QLineEdit>
 #include <QLabel>
-#include <QtWidgets/qdialog.h>
-#include <QGridLayout>
-#include <QToolButton>
-#include <QDebug>
-#include <QtMath>
-#include <QMessageBox>
-#include <QPushButton>
+
+
+class button;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
